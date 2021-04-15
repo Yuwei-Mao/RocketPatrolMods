@@ -1,6 +1,9 @@
 //CMPM 120
 //UC Santa Cruz
-//Yuwei Mao
+//Creater Name: Yuwei Mao
+//Project Title: Rocket Patrol Mods
+//Points Breakdown:
+//Allow the player to control the Rocket after it's fired (5)
 
 //game configuration
 let config = {
