@@ -8,6 +8,7 @@ class Play extends Phaser.Scene{
         this.load.image('starfield','assets/starfield.png');
         this.load.image('starfield2','assets/starfield2.png');
         this.load.image('board','assets/board.png');
+        this.load.image('attention','assets/attention.png');
         //load spritesheet
         this.load.spritesheet('explosion','assets/explosion.png',{
             frameWidth: 64,
@@ -22,6 +23,12 @@ class Play extends Phaser.Scene{
             endFrame: 5
         });
         this.load.spritesheet('spaceship2','assets/sun2.png',{
+            frameWidth: 32,
+            frameHeigh: 32,
+            startFrame: 0,
+            endFrame: 5
+        });
+        this.load.spritesheet('explosionsun2','assets/explosionsun2.png',{
             frameWidth: 32,
             frameHeigh: 32,
             startFrame: 0,
@@ -51,6 +58,20 @@ class Play extends Phaser.Scene{
             repeat:-1
         });
 
+        this.anims.create({
+            key: 'sun2',
+            frames: this.anims.generateFrameNumbers('spaceship2', { start: 0, end: 5, first: 0}),
+            frameRate: 10,
+            repeat:-1
+        });
+
+        this.anims.create({
+            key: 'explodesun2',
+            frames: this.anims.generateFrameNumbers('explosionsun2', { start: 0, end: 5, first: 0}),
+            frameRate: 15,
+            
+        });
+
         //place starfield
         this.starfield = this.add.tileSprite(0,0,640,480,'starfield').setOrigin(0,0);
 
@@ -74,7 +95,7 @@ class Play extends Phaser.Scene{
 
         //add new spaceship 
         //Create a new spaceship type (w/ new artwork) that's smaller, moves faster, and is worth more points (20)
-        this.ship04 = Spaceship2(this,game.config.width + borderUISize*9, borderUISize *7 +borderPadding*8, 'spaceship2',0,50).setOrigin(0,0);
+        this.ship04 = new Spaceship2(this,game.config.width + borderUISize*9, borderUISize *7 +borderPadding*8, 'spaceship2',0,50).setOrigin(0,0);
         this.ship04.anims.play('sun2');
 
         //define keys
@@ -112,9 +133,18 @@ class Play extends Phaser.Scene{
         this.gameOver = true;
         }, null, this);
 
+        //Implement the speed increase that happens after 30 seconds in the original game (5)
+        this.clock2 = this.time.delayedCall(30000, () => {
+            game.settings.spaceshipSpeed += 2;
+            //add attention 
+            this.attention = this.add.sprite(borderUISize*13 + borderPadding, borderPadding*4,'attention').setOrigin(0,0);
+
+        }, null, this);
+
         // Display the time remaining (in seconds) on the screen (10)
         this.board1 = this.add.sprite(borderUISize + borderPadding, borderPadding*2,'board').setOrigin(0,0);
         this.board2 = this.add.sprite(borderUISize*4 + borderPadding, borderPadding*2,'board').setOrigin(0,0);
+        this.board3 = this.add.sprite(borderUISize*7 + borderPadding, borderPadding*2,'board').setOrigin(0,0);
         //Initalize SCORE
         this.p1Score = 0;
         // add score to the scene
@@ -123,10 +153,29 @@ class Play extends Phaser.Scene{
         this.timer1 = game.settings.gameTimer/1000;
         // add timer to the scene
         this.timeRight = this.add.text(borderUISize*4 + borderPadding*2, borderUISize + borderPadding*2, this.timer1, scoreConfig);
+        // add high score
+        this.highscoreRight = this.add.text(borderUISize*7 + borderPadding*2, borderUISize + borderPadding*2, highscore, scoreConfig);
+        //display text 
+        let textConfig = {
+            fontFamily: 'Arial',
+            fontSize: '15px',
+            color: '#212F3D',
+            align: 'right',
+            padding: {
+              top: 5,
+              bottom: 5,
+            },
+            fixedWidth: 220
+          }
+        this.textLeft = this.add.text(borderUISize + borderPadding, borderUISize*2 + borderPadding*4 , " Score        Time        High Score",textConfig);
 
         //place starfield2
         //Implement parallax scrolling (10)
         this.starfield2 = this.add.tileSprite(0,0,640,480,'starfield2').setOrigin(0,0);
+
+        
+        
+        
         
     
     }
@@ -135,6 +184,7 @@ class Play extends Phaser.Scene{
 
         // check key input for restart
         if (this.gameOver && Phaser.Input.Keyboard.JustDown(keyR)) {
+            game.settings.spaceshipSpeed -= 2;
             this.scene.restart();
         }
         this.starfield.tilePositionX -= starSpeed;
@@ -167,6 +217,11 @@ class Play extends Phaser.Scene{
             this.p1Rocket.reset();
             this.shipExplode(this.ship01);
         }
+
+        if(this.checkCollision(this.p1Rocket,this.ship04)) {
+            this.p1Rocket.reset();
+            this.shipExplode(this.ship04);
+        }
         
         if (this.gameOver && Phaser.Input.Keyboard.JustDown(keyM)) {
             this.scene.start("menuScene");
@@ -189,7 +244,14 @@ class Play extends Phaser.Scene{
         ship.alpha = 0;
         // create explosion sprite at ship's position
         let boom = this.add.sprite(ship.x, ship.y, 'explosion').setOrigin(0, 0);
-        boom.anims.play('explode');             // play explode animation
+
+        if (ship.points ==50) {
+            boom.anims.play('explodesun2'); 
+        } else{
+            boom.anims.play('explode');   
+        }
+
+                // play explode animation
         boom.on('animationcomplete', () => {    // callback after anim completes
           ship.reset();                         // reset ship position
           ship.alpha = 1;                       // make ship visible again

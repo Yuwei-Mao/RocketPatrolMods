@@ -10,6 +10,8 @@ class Spaceship2 extends Phaser.GameObjects.Sprite{
 
     update() {
         
+        //update movespeed
+        this.moveSpeed = game.settings.spaceshipSpeed;
         //move spaceship left
         this.x -= this.moveSpeed * 2;
         //wrap around from left to right

@@ -1,7 +1,9 @@
 //CMPM 120
 //UC Santa Cruz
 //Creater Name: Yuwei Mao
-//Project Title: Rocket Patrol Mods
+//Project Title: Rocket Patrol Mods (Shut the Sun)
+//Time to finish: 13 Hour
+
 //Points Breakdown:
 //Allow the player to control the Rocket after it's fired (5)
 //Display the time remaining (in seconds) on the screen (10)
@@ -12,7 +14,14 @@
 //Track a high score that persists across scenes and display it in the UI (5)
 //Add your own (copyright-free) background music to the Play scene (5)
 //Create 4 new explosion SFX and randomize which one plays on impact (10)
+//Create a new spaceship type (w/ new artwork) that's smaller, moves faster, and is worth more points (20)
+//Implement the speed increase that happens after 30 seconds in the original game (5)
+//total: 105
 
+// I am not sure if I finished (Redesign the game's artwork, UI, and sound to change its theme/aesthetic (to something other than sci-fi) (60))
+
+// All graphics are made by me with Aseprite, Illustrator, and SketchBook(iPad OS).
+// All sound is made by me with Audacity and Gadget 2(iOS).
 
 //game configuration
 let config = {
