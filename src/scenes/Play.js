@@ -21,6 +21,12 @@ class Play extends Phaser.Scene{
             startFrame: 0,
             endFrame: 5
         });
+        this.load.spritesheet('spaceship2','assets/sun2.png',{
+            frameWidth: 32,
+            frameHeigh: 32,
+            startFrame: 0,
+            endFrame: 5
+        });
         this.load.audio('bgm','assets/Elusive Perch.wav');
     }
 
@@ -65,6 +71,11 @@ class Play extends Phaser.Scene{
         this.ship02.anims.play('sun');
         this.ship03 = new Spaceship(this,game.config.width, borderUISize *6 +borderPadding*4, 'spaceship',0,10).setOrigin(0,0);
         this.ship03.anims.play('sun');
+
+        //add new spaceship 
+        //Create a new spaceship type (w/ new artwork) that's smaller, moves faster, and is worth more points (20)
+        this.ship04 = Spaceship2(this,game.config.width + borderUISize*9, borderUISize *7 +borderPadding*8, 'spaceship2',0,50).setOrigin(0,0);
+        this.ship04.anims.play('sun2');
 
         //define keys
         keyF = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.F);
@@ -135,6 +146,7 @@ class Play extends Phaser.Scene{
             this.ship01.update();
             this.ship02.update();
             this.ship03.update();
+            this.ship04.update();
             // change the text of time remaining
             this.timer1 = game.settings.gameTimer/1000 - this.clock.getElapsed()/1000;
             this.timeRight.setText(this.timer1.toFixed(1));
