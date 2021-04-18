@@ -6,11 +6,12 @@ class Play extends Phaser.Scene{
     preload() {
         this.load.image('rocket','assets/rocket.png');
         this.load.image('starfield','assets/starfield.png');
+        this.load.image('starfield2','assets/starfield2.png');
         this.load.image('board','assets/board.png');
         //load spritesheet
         this.load.spritesheet('explosion','assets/explosion.png',{
             frameWidth: 64,
-            frameHeigh: 32,
+            frameHeigh: 64,
             startFrame: 0,
             endFrame: 9
         });
@@ -20,9 +21,15 @@ class Play extends Phaser.Scene{
             startFrame: 0,
             endFrame: 5
         });
+        this.load.audio('bgm','assets/Elusive Perch.wav');
     }
 
     create() {
+
+        //Add your own (copyright-free) background music to the Play scene (5)
+        this.bgm = game.sound.add('bgm');
+        this.bgm.loop = true;
+        this.bgm.play();
 
         // animation config
         this.anims.create({
@@ -64,6 +71,7 @@ class Play extends Phaser.Scene{
         keyR = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R);
         keyLEFT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
         keyRIGHT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
+        keyM = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.M);
 
         
 
@@ -86,8 +94,10 @@ class Play extends Phaser.Scene{
         // 60/45-second play clock
         scoreConfig.fixedWidth = 0;
         this.clock = this.time.delayedCall(game.settings.gameTimer, () => {
+            if (this.p1Score > highscore) {highscore = this.p1Score;}
             this.add.text(game.config.width/2, game.config.height/2, 'GAME OVER', scoreConfig).setOrigin(0.5);
-            this.add.text(game.config.width/2, game.config.height/2 + 64, 'Press (R) to Restart or ← for Menu', scoreConfig).setOrigin(0.5);
+            this.add.text(game.config.width/2, game.config.height/2 + 64, 'Press (R) to Restart or (M) for Menu', scoreConfig).setOrigin(0.5);
+            this.add.text(game.config.width/2, game.config.height/2 + 64*2, 'High Score:'+highscore, scoreConfig).setOrigin(0.5);
         this.gameOver = true;
         }, null, this);
 
@@ -103,7 +113,9 @@ class Play extends Phaser.Scene{
         // add timer to the scene
         this.timeRight = this.add.text(borderUISize*4 + borderPadding*2, borderUISize + borderPadding*2, this.timer1, scoreConfig);
 
-
+        //place starfield2
+        //Implement parallax scrolling (10)
+        this.starfield2 = this.add.tileSprite(0,0,640,480,'starfield2').setOrigin(0,0);
         
     
     }
@@ -115,6 +127,7 @@ class Play extends Phaser.Scene{
             this.scene.restart();
         }
         this.starfield.tilePositionX -= starSpeed;
+        this.starfield2.tilePositionX -= starSpeed*0.8;
         if (!this.gameOver){
             //update the rocket
             this.p1Rocket.update();
@@ -143,7 +156,7 @@ class Play extends Phaser.Scene{
             this.shipExplode(this.ship01);
         }
         
-        if (this.gameOver && Phaser.Input.Keyboard.JustDown(keyLEFT)) {
+        if (this.gameOver && Phaser.Input.Keyboard.JustDown(keyM)) {
             this.scene.start("menuScene");
         }
     }
@@ -175,7 +188,13 @@ class Play extends Phaser.Scene{
         this.p1Score+=ship.points;
         this.scoreLeft.text = this.p1Score;
 
-        this.sound.play('sfx_explosion');
+        //this.sound.play('sfx_explosion');
+        //Create 4 new explosion SFX and randomize which one plays on impact (10)
+        let a = Math.ceil( Math.random( )*4 );
+        if (a==1){ this.sound.play('sfx_explosion1');}
+        else if (a==2) {this.sound.play('sfx_explosion2');}
+        else if (a==3) {this.sound.play('sfx_explosion3');}
+        else if (a==4) {this.sound.play('sfx_explosion4');}
       }
 
 
